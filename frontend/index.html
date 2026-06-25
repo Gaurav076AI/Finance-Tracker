@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- SCREEN 1: SIGN IN -->
+<div id="screen-auth" class="screen active">
+  <div class="auth-box">
+    
+    <div class="auth-title">Welcome back</div>
+    <div class="auth-sub">Sign in to your finance tracker</div>
+    <div class="field">
+      <label for="email-in">EMAIL / STUDENT ID</label>
+      <input type="text" placeholder="gaurav@ku.edu.np" id="email-in">
+    </div>
+    <div class="field">
+      <label for="password-in">PASSWORD</label>
+      <input type="password" placeholder="••••••••" id="password-in">
+    </div>
+    <button class="btn btn-primary" id="btn-sign-in">Sign In</button>
+    <button class="btn btn-ghost" id="btn-create-account">Create Account</button>
+  </div>
+</div>
+
+<!-- SCREEN 2: ONBOARDING -->
+<div id="screen-onboard" class="screen">
+  <div class="onboard-box">
+    <div class="step-bar">
+      <div class="step-dot done" id="s1"></div>
+      <div class="step-dot" id="s2"></div>
+      <div class="step-dot" id="s3"></div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="ob-step1">
+      <div class="ob-title">Who are you?</div>
+      <div class="ob-sub">Help us personalize your tracker</div>
+      <div class="choice-grid">
+        <div class="choice-btn selected" id="c-student">
+          <div class="choice-icon">🎓</div>
+          <div class="choice-label">Student</div>
+          <div class="choice-desc">KU enrolled</div>
+        </div>
+        <div class="choice-btn" id="c-other">
+          <div class="choice-icon">👤</div>
+          <div class="choice-label">Other</div>
+          <div class="choice-desc">Faculty / Staff / Guest</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" data-step="2">Continue →</button>
+    </div>
+
+    <!-- Step 2 (student) -->
+    <div id="ob-step2-student" class="hidden">
+      <div class="ob-title">Do you live in hostel?</div>
+      <div class="ob-sub">This helps estimate your living costs</div>
+      <div class="choice-grid">
+        <div class="choice-btn selected" id="c-hostel">
+          <div class="choice-icon">🏠</div>
+          <div class="choice-label">Yes, Hostel</div>
+          <div class="choice-desc">On-campus living</div>
+        </div>
+        <div class="choice-btn" id="c-home">
+          <div class="choice-icon">🏡</div>
+          <div class="choice-label">No, Home / Rent</div>
+          <div class="choice-desc">Off-campus</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" data-step="3">Continue →</button>
+      <button class="btn btn-ghost" data-step="1">← Back</button>
+    </div>
+
+    <!-- Step 2 (other) -->
+    <div id="ob-step2-other" class="hidden">
+      <div class="ob-title">A bit about yourself</div>
+      <div class="ob-sub">We'll tailor categories for you</div>
+      <div class="choice-grid three-col">
+        <div class="choice-btn" data-toggle-sel>
+          <div class="choice-icon">💍</div>
+          <div class="choice-label sm">Married</div>
+        </div>
+        <div class="choice-btn" data-toggle-sel>
+          <div class="choice-icon">👶</div>
+          <div class="choice-label sm">Has Kids</div>
+        </div>
+        <div class="choice-btn" data-toggle-sel>
+          <div class="choice-icon">🚗</div>
+          <div class="choice-label sm">Has Vehicle</div>
+        </div>
+      </div>
+      <textarea class="ob-textarea" placeholder="Describe your situation (optional) — e.g. 'Faculty member, renting near campus, occasional travel...'"></textarea>
+      <button class="btn btn-primary mt-14" data-step="3">Continue →</button>
+      <button class="btn btn-ghost" data-step="1">← Back</button>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="ob-step3" class="hidden">
+      <div class="ob-title">Set your monthly budget</div>
+      <div class="ob-sub">You can change this any time</div>
+      <div class="field" style="margin-bottom:20px">
+        <label for="budget-in">MONTHLY INCOME / ALLOWANCE (NPR)</label>
+        <input class="add-input budget-input" type="number" placeholder="e.g. 15000" id="budget-in">
+      </div>
+      <button class="btn btn-primary" id="btn-start-tracking">Start Tracking 🚀</button>
+      <button class="btn btn-ghost" data-step="2">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCREEN 3: DASHBOARD -->
+<div id="screen-dash" class="screen">
+  <div class="topbar">
+    <div class="topbar-logo">KU · FINTRACK</div>
+    <div class="topbar-right">
+      <span class="month-badge" id="month-label">JUNE 2026</span>
+      <div class="user-chip">
+        <div class="avatar" id="user-avatar">G</div>
+        <span id="user-name">Gaurav</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-body">
+
+    <!-- Summary -->
+    <div class="summary-row">
+      <div class="sum-card">
+        <div class="sum-label">TOTAL BUDGET</div>
+        <div class="sum-amount blue" id="disp-budget">NPR 15,000</div>
+        <div class="sum-note">Monthly allowance</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">SPENT SO FAR</div>
+        <div class="sum-amount red" id="disp-spent">NPR 8,450</div>
+        <div class="sum-note" id="spent-note">56% of budget used</div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">REMAINING</div>
+        <div class="sum-amount green" id="disp-left">NPR 6,550</div>
+        <div class="sum-note" id="remaining-note">5 days left in month</div>
+      </div>
+    </div>
+
+    <!-- Add Expense -->
+    <div class="section-title">ADD EXPENSE</div>
+    <div class="add-row">
+      <input class="add-input" type="text" placeholder="What did you buy? e.g. Momo at TU canteen" id="exp-name">
+      <input class="add-input narrow" type="number" placeholder="Amount (NPR)" id="exp-amt">
+      <select class="add-select" id="exp-cat">
+        <option value="food">🍜 Food</option>
+        <option value="transport">🚌 Transport</option>
+        <option value="clothes">👕 Clothes</option>
+        <option value="study">📚 Study</option>
+        <option value="other">💡 Other</option>
+      </select>
+      <button class="btn-add" id="btn-add-expense">+ Add</button>
+    </div>
+
+    <!-- Categories -->
+    <div class="section-title">SPENDING BY CATEGORY</div>
+    <div class="cat-grid" id="cat-grid"></div>
+
+    <!-- Recent Transactions -->
+    <div class="section-title">RECENT TRANSACTIONS</div>
+    <div class="recent-list" id="recent-list"></div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Expense added!</div>
+
+<script src="app.js"></script>
+</body>
+</html>
