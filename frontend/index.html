@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finance Tracker</title>
+  <title>KU Finance Tracker</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
 <!-- SCREEN 1: SIGN IN -->
 <div id="screen-auth" class="screen active">
+  <div class="auth-glow"></div>
   <div class="auth-box">
-    
+    <div class="logo">KU · FINTRACK</div>
     <div class="auth-title">Welcome back</div>
-    <div class="auth-sub">Sign in to your finance tracker</div>
+    <div class="auth-sub">Sign in to track your monthly spending smartly</div>
     <div class="field">
       <label for="email-in">EMAIL / STUDENT ID</label>
       <input type="text" placeholder="gaurav@ku.edu.np" id="email-in">
@@ -30,84 +32,121 @@
 <!-- SCREEN 2: ONBOARDING -->
 <div id="screen-onboard" class="screen">
   <div class="onboard-box">
-    <div class="step-bar">
-      <div class="step-dot done" id="s1"></div>
-      <div class="step-dot" id="s2"></div>
-      <div class="step-dot" id="s3"></div>
-    </div>
+    <div class="step-bar" id="step-bar"></div>
 
-    <!-- Step 1 -->
-    <div id="ob-step1">
-      <div class="ob-title">Who are you?</div>
-      <div class="ob-sub">Help us personalize your tracker</div>
+    <!-- Step: Are you a student? -->
+    <div id="ob-student-q" class="ob-panel">
+      <div class="ob-title">Are you a student?</div>
+      <div class="ob-sub">We'll customize your expense categories</div>
       <div class="choice-grid">
-        <div class="choice-btn selected" id="c-student">
+        <div class="choice-btn selected" id="c-yes-student">
           <div class="choice-icon">🎓</div>
-          <div class="choice-label">Student</div>
-          <div class="choice-desc">KU enrolled</div>
+          <div class="choice-label">Yes, Student</div>
+          <div class="choice-desc">KU or other college</div>
         </div>
-        <div class="choice-btn" id="c-other">
-          <div class="choice-icon">👤</div>
-          <div class="choice-label">Other</div>
-          <div class="choice-desc">Faculty / Staff / Guest</div>
+        <div class="choice-btn" id="c-no-student">
+          <div class="choice-icon">💼</div>
+          <div class="choice-label">Not a Student</div>
+          <div class="choice-desc">Working / Faculty / Other</div>
         </div>
       </div>
-      <button class="btn btn-primary" data-step="2">Continue →</button>
+      <button class="btn btn-primary" id="ob-next-student-q">Continue →</button>
     </div>
 
-    <!-- Step 2 (student) -->
-    <div id="ob-step2-student" class="hidden">
+    <!-- Step: Hostel (students) -->
+    <div id="ob-hostel" class="ob-panel hidden">
       <div class="ob-title">Do you live in hostel?</div>
       <div class="ob-sub">This helps estimate your living costs</div>
       <div class="choice-grid">
-        <div class="choice-btn selected" id="c-hostel">
+        <div class="choice-btn selected" id="c-hostel-yes">
           <div class="choice-icon">🏠</div>
           <div class="choice-label">Yes, Hostel</div>
           <div class="choice-desc">On-campus living</div>
         </div>
-        <div class="choice-btn" id="c-home">
+        <div class="choice-btn" id="c-hostel-no">
           <div class="choice-icon">🏡</div>
           <div class="choice-label">No, Home / Rent</div>
           <div class="choice-desc">Off-campus</div>
         </div>
       </div>
-      <button class="btn btn-primary" data-step="3">Continue →</button>
-      <button class="btn btn-ghost" data-step="1">← Back</button>
+      <button class="btn btn-primary" id="ob-next-hostel">Continue →</button>
+      <button class="btn btn-ghost ob-back" data-back="student-q">← Back</button>
     </div>
 
-    <!-- Step 2 (other) -->
-    <div id="ob-step2-other" class="hidden">
-      <div class="ob-title">A bit about yourself</div>
-      <div class="ob-sub">We'll tailor categories for you</div>
-      <div class="choice-grid three-col">
-        <div class="choice-btn" data-toggle-sel>
+    <!-- Step: Single or Married (non-students) -->
+    <div id="ob-marital" class="ob-panel hidden">
+      <div class="ob-title">Are you single or married?</div>
+      <div class="ob-sub">Helps us understand your household expenses</div>
+      <div class="choice-grid">
+        <div class="choice-btn selected" id="c-single">
+          <div class="choice-icon">🧑</div>
+          <div class="choice-label">Single</div>
+          <div class="choice-desc">Living alone or with roommates</div>
+        </div>
+        <div class="choice-btn" id="c-married">
           <div class="choice-icon">💍</div>
-          <div class="choice-label sm">Married</div>
-        </div>
-        <div class="choice-btn" data-toggle-sel>
-          <div class="choice-icon">👶</div>
-          <div class="choice-label sm">Has Kids</div>
-        </div>
-        <div class="choice-btn" data-toggle-sel>
-          <div class="choice-icon">🚗</div>
-          <div class="choice-label sm">Has Vehicle</div>
+          <div class="choice-label">Married</div>
+          <div class="choice-desc">Shared household</div>
         </div>
       </div>
-      <textarea class="ob-textarea" placeholder="Describe your situation (optional) — e.g. 'Faculty member, renting near campus, occasional travel...'"></textarea>
-      <button class="btn btn-primary mt-14" data-step="3">Continue →</button>
-      <button class="btn btn-ghost" data-step="1">← Back</button>
+      <button class="btn btn-primary" id="ob-next-marital">Continue →</button>
+      <button class="btn btn-ghost ob-back" data-back="student-q">← Back</button>
     </div>
 
-    <!-- Step 3 -->
-    <div id="ob-step3" class="hidden">
+    <!-- Step: Kids (married only) -->
+    <div id="ob-kids" class="ob-panel hidden">
+      <div class="ob-title">Do you have kids?</div>
+      <div class="ob-sub">Family expenses are tracked differently</div>
+      <div class="choice-grid">
+        <div class="choice-btn selected" id="c-kids-yes">
+          <div class="choice-icon">👶</div>
+          <div class="choice-label">Yes, I have kids</div>
+          <div class="choice-desc">Includes school & care costs</div>
+        </div>
+        <div class="choice-btn" id="c-kids-no">
+          <div class="choice-icon">🚫</div>
+          <div class="choice-label">No kids</div>
+          <div class="choice-desc">Just adults in household</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="ob-next-kids">Continue →</button>
+      <button class="btn btn-ghost ob-back" data-back="marital">← Back</button>
+    </div>
+
+    <!-- Step: Loan (non-students) -->
+    <div id="ob-loan" class="ob-panel hidden">
+      <div class="ob-title">Do you have a loan?</div>
+      <div class="ob-sub">We'll track it alongside your monthly spending</div>
+      <div class="choice-grid">
+        <div class="choice-btn selected" id="c-loan-no">
+          <div class="choice-icon">✅</div>
+          <div class="choice-label">No Loan</div>
+          <div class="choice-desc">Debt-free right now</div>
+        </div>
+        <div class="choice-btn" id="c-loan-yes">
+          <div class="choice-icon">🏦</div>
+          <div class="choice-label">Yes, I have a loan</div>
+          <div class="choice-desc">Education, home, vehicle…</div>
+        </div>
+      </div>
+      <div class="field hidden" id="loan-amount-field">
+        <label for="loan-amount-in">TOTAL LOAN AMOUNT (NPR)</label>
+        <input class="add-input budget-input" type="number" placeholder="e.g. 500000" id="loan-amount-in">
+      </div>
+      <button class="btn btn-primary" id="ob-next-loan">Continue →</button>
+      <button class="btn btn-ghost ob-back" data-back="loan-back">← Back</button>
+    </div>
+
+    <!-- Step: Budget -->
+    <div id="ob-budget" class="ob-panel hidden">
       <div class="ob-title">Set your monthly budget</div>
-      <div class="ob-sub">You can change this any time</div>
-      <div class="field" style="margin-bottom:20px">
+      <div class="ob-sub">You can change this any time from settings</div>
+      <div class="field">
         <label for="budget-in">MONTHLY INCOME / ALLOWANCE (NPR)</label>
         <input class="add-input budget-input" type="number" placeholder="e.g. 15000" id="budget-in">
       </div>
       <button class="btn btn-primary" id="btn-start-tracking">Start Tracking 🚀</button>
-      <button class="btn btn-ghost" data-step="2">← Back</button>
+      <button class="btn btn-ghost ob-back" data-back="budget-back">← Back</button>
     </div>
   </div>
 </div>
@@ -127,30 +166,88 @@
 
   <div class="dash-body">
 
-    <!-- Summary -->
-    <div class="summary-row">
-      <div class="sum-card">
+    <!-- Text insight banner -->
+    <div class="insight-banner" id="insight-banner">
+      <div class="insight-icon">📊</div>
+      <div>
+        <div class="insight-title">Monthly Overview</div>
+        <div class="insight-text" id="insight-text">Loading your summary…</div>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-row" id="summary-row">
+      <div class="sum-card glow-blue">
         <div class="sum-label">TOTAL BUDGET</div>
-        <div class="sum-amount blue" id="disp-budget">NPR 15,000</div>
+        <div class="sum-amount blue" id="disp-budget">NPR 0</div>
         <div class="sum-note">Monthly allowance</div>
       </div>
-      <div class="sum-card">
+      <div class="sum-card glow-red">
         <div class="sum-label">SPENT SO FAR</div>
-        <div class="sum-amount red" id="disp-spent">NPR 8,450</div>
-        <div class="sum-note" id="spent-note">56% of budget used</div>
+        <div class="sum-amount red" id="disp-spent">NPR 0</div>
+        <div class="sum-note" id="spent-note">0% of budget used</div>
       </div>
-      <div class="sum-card">
+      <div class="sum-card glow-green">
         <div class="sum-label">REMAINING</div>
-        <div class="sum-amount green" id="disp-left">NPR 6,550</div>
-        <div class="sum-note" id="remaining-note">5 days left in month</div>
+        <div class="sum-amount green" id="disp-left">NPR 0</div>
+        <div class="sum-note" id="remaining-note">— days left in month</div>
       </div>
+      <div class="sum-card glow-purple hidden" id="loan-card">
+        <div class="sum-label">OUTSTANDING LOAN</div>
+        <div class="sum-amount purple" id="disp-loan">NPR 0</div>
+        <div class="sum-note" id="loan-note">Tracked from onboarding</div>
+      </div>
+    </div>
+
+    <!-- Highlight cards -->
+    <div class="highlight-row">
+      <div class="highlight-card">
+        <div class="highlight-label">🔥 Most Expensive Category</div>
+        <div class="highlight-value" id="top-category">—</div>
+        <div class="highlight-sub" id="top-category-amt">Add expenses to see</div>
+      </div>
+      <div class="highlight-card">
+        <div class="highlight-label">🏆 Most Purchased Item</div>
+        <div class="highlight-value" id="top-item">—</div>
+        <div class="highlight-sub" id="top-item-detail">Add expenses to see</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="section-title">MONTHLY SPENDING BY CATEGORY</span>
+          <span class="chart-badge">Visual breakdown</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="categoryChart"></canvas>
+        </div>
+        <p class="chart-caption" id="category-caption">No spending recorded yet.</p>
+      </div>
+      <div class="chart-card">
+        <div class="chart-header">
+          <span class="section-title">BUDGET VS SPENT</span>
+          <span class="chart-badge">This month</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="budgetChart"></canvas>
+        </div>
+        <p class="chart-caption" id="budget-caption">Set your budget during onboarding.</p>
+      </div>
+    </div>
+
+    <!-- Top purchased items -->
+    <div class="section-title">TOP PURCHASED ITEMS</div>
+    <div class="top-items-list" id="top-items-list">
+      <div class="empty-state">No items yet — add your first expense below!</div>
     </div>
 
     <!-- Add Expense -->
     <div class="section-title">ADD EXPENSE</div>
     <div class="add-row">
-      <input class="add-input" type="text" placeholder="What did you buy? e.g. Momo at TU canteen" id="exp-name">
-      <input class="add-input narrow" type="number" placeholder="Amount (NPR)" id="exp-amt">
+      <input class="add-input" type="text" placeholder="Item name e.g. Momo, T-shirt" id="exp-name">
+      <input class="add-input narrow" type="number" placeholder="Price (NPR)" id="exp-amt">
       <select class="add-select" id="exp-cat">
         <option value="food">🍜 Food</option>
         <option value="transport">🚌 Transport</option>
@@ -167,7 +264,9 @@
 
     <!-- Recent Transactions -->
     <div class="section-title">RECENT TRANSACTIONS</div>
-    <div class="recent-list" id="recent-list"></div>
+    <div class="recent-list" id="recent-list">
+      <div class="empty-state">No transactions yet.</div>
+    </div>
 
   </div>
 </div>
